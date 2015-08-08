@@ -1,0 +1,40 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowBackground">@color/background_color</item>
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <style name="passcode_button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_margin">1dp</item>
+        <item name="android:background">@drawable/passcode_button</item>
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <style name="passcode_row">
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="passcode_table">
+        <item name="android:background">@color/secondary_background_color</item>
+    </style>
+
+    <style name="passcode_text">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:background">#6894B2</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginTop">32dp</item>
+        <item name="android:layout_marginBottom">32dp</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+</resources>
