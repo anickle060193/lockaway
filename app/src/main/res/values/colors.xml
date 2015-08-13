@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="text_color">#CFD3D4</color>
-    <color name="background_color">#4E4F50</color>
-    <color name="secondary_background_color">#2C3E50</color>
+    <color name="almost_white">#CFD3D4</color>
+    <color name="dull_gray">#4E4F50</color>
+    <color name="dark_blue">#2C3E50</color>
     <color name="dull_blue">#6894B2</color>
+    <color name="bright_blue">#2980B9</color>
+    <color name="bright_light_blue">#3498DB</color>
 
-    <color name="button_pressed_color">#2980B9</color>
-    <color name="button_default_color">#3498DB</color>
+    <color name="text_color">@color/almost_white</color>
+    <color name="background_color">@color/dull_gray</color>
+    <color name="secondary_background_color">@color/dark_blue</color>
+
+    <color name="button_pressed_color">@color/bright_blue</color>
+    <color name="button_default_color">@color/bright_light_blue</color>
 
 </resources>

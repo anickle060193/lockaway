@@ -1,5 +1,6 @@
 package com.adamnickle.lockaway;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
@@ -9,8 +10,10 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Formatter;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -30,6 +33,8 @@ public class FileSelectorFragment extends Fragment
     private RecyclerView mRecyclerView;
     private TextView mParentDirectory;
     private ImageButton mToParentDirectory;
+
+    private ViewHolder mSelectedFile;
 
     private FileSystemRecyclerAdapter mFileSystemAdapter;
 
@@ -61,7 +66,7 @@ public class FileSelectorFragment extends Fragment
             File root = null;
             if( intent != null )
             {
-                String filename = intent.getStringExtra( FileSelectorActivity.EXTRA_FILENAME );
+                String filename = intent.getStringExtra( FileSelectorActivity.EXTRA_INITIAL_DIRECTORY );
                 if( filename != null )
                 {
                     File file = new File( filename );
@@ -98,37 +103,59 @@ public class FileSelectorFragment extends Fragment
     {
         super.onActivityCreated( savedInstanceState );
 
-        final View view = getView();
-        if( view != null )
+        getActivity().setResult( Activity.RESULT_CANCELED );
+    }
+
+    public boolean onBackPressed()
+    {
+        return mFileSystemAdapter.gotoParentDirectory();
+    }
+
+    @Override
+    public void onCreateOptionsMenu( Menu menu, MenuInflater inflater )
+    {
+        inflater.inflate( R.menu.menu_file_selector, menu );
+    }
+
+    @Override
+    public boolean onOptionsItemSelected( MenuItem item )
+    {
+        switch( item.getItemId() )
         {
-            view.setFocusableInTouchMode( true );
-            view.requestFocus();
-            view.setOnKeyListener( new View.OnKeyListener()
-            {
-                @Override
-                public boolean onKey( View v, int keyCode, KeyEvent event )
-                {
-                    if( event.getAction() == KeyEvent.ACTION_DOWN )
-                    {
-                        if( keyCode == KeyEvent.KEYCODE_BACK )
-                        {
-                            return mFileSystemAdapter.gotoParentDirectory();
-                        }
-                    }
-                    return false;
-                }
-            } );
+            case R.id.done:
+                Intent data = new Intent();
+                data.putExtra( FileSelectorActivity.EXTRA_FILENAME, mSelectedFile.File.getAbsolutePath() );
+                getActivity().setResult( Activity.RESULT_OK, data );
+                getActivity().finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected( item );
+        }
+    }
+
+    private void update()
+    {
+        mToParentDirectory.setEnabled( mFileSystemAdapter.getDirectory().getParentFile() != null );
+        mParentDirectory.setText( mFileSystemAdapter.getDirectory().getAbsolutePath() );
+        if( mSelectedFile != null )
+        {
+            setHasOptionsMenu( true );
         }
     }
 
     private class ViewHolder extends RecyclerView.ViewHolder
     {
+        File File;
+
         View MainView;
         ImageView Icon;
         TextView Name;
         TextView Size;
 
         long PopulatingThreadId;
+
+        private boolean mSelected = false;
 
         public ViewHolder( View itemView )
         {
@@ -154,11 +181,48 @@ public class FileSelectorFragment extends Fragment
                 } );
             }
         }
+
+        public void toggleSelect()
+        {
+            if( this.mSelected )
+            {
+                deselect();
+            }
+            else
+            {
+                select();
+            }
+        }
+
+        public void select()
+        {
+            if( mSelectedFile != null )
+            {
+                mSelectedFile.deselect();
+            }
+            mSelectedFile = this;
+            this.mSelected = true;
+            MainView.setBackgroundResource( R.color.bright_blue );
+            update();
+        }
+
+        public void deselect()
+        {
+            MainView.setBackgroundResource( R.color.background_color );
+            mSelectedFile = null;
+            this.mSelected = false;
+            update();
+        }
     }
 
     private class FileSystemRecyclerAdapter extends ArrayRecyclerAdapter<File, ViewHolder>
     {
         private File mCurrentDirectory;
+
+        public File getDirectory()
+        {
+            return mCurrentDirectory;
+        }
 
         public void setDirectory( File file )
         {
@@ -180,12 +244,6 @@ public class FileSelectorFragment extends Fragment
                     update();
                 }
             }
-        }
-
-        private void update()
-        {
-            mToParentDirectory.setEnabled( mCurrentDirectory.getParentFile() != null );
-            mParentDirectory.setText( mCurrentDirectory.getAbsolutePath() );
         }
 
         public boolean gotoParentDirectory()
@@ -242,10 +300,12 @@ public class FileSelectorFragment extends Fragment
         @Override
         public void onBindViewHolder( final ViewHolder holder, int position )
         {
-            final File file = get( position );
-            if( file.isDirectory() )
+            holder.File = get( position );
+            holder.deselect();
+
+            if( holder.File.isDirectory() )
             {
-                if( file.canRead() )
+                if( holder.File.canRead() )
                 {
                     holder.Icon.setImageResource( R.drawable.ic_folder_open_white_48dp );
                 }
@@ -260,7 +320,7 @@ public class FileSelectorFragment extends Fragment
                     @Override
                     public void onClick( View v )
                     {
-                        FileSystemRecyclerAdapter.this.setDirectory( file );
+                        FileSystemRecyclerAdapter.this.setDirectory( holder.File );
                     }
                 } );
             }
@@ -268,8 +328,15 @@ public class FileSelectorFragment extends Fragment
             {
                 holder.Icon.setImageResource( R.drawable.ic_file );
                 holder.Size.setVisibility( View.VISIBLE );
-                holder.Size.setText( Formatter.formatFileSize( getActivity(), file.length() ) );
-                holder.MainView.setClickable( false );
+                holder.Size.setText( Formatter.formatFileSize( getActivity(), holder.File.length() ) );
+                holder.MainView.setOnClickListener( new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick( View v )
+                    {
+                        holder.toggleSelect();
+                    }
+                } );
 
                 final Thread t = new Thread()
                 {
@@ -277,13 +344,13 @@ public class FileSelectorFragment extends Fragment
                     public void run()
                     {
                         final int thumbnailSize = getActivity().getResources().getDimensionPixelSize( R.dimen.file_item_thumbnail );
-                        Bitmap icon = BitmapHelper.createScaledBitmap( file.getAbsolutePath(), thumbnailSize, thumbnailSize );
+                        Bitmap icon = BitmapHelper.createScaledBitmap( holder.File.getAbsolutePath(), thumbnailSize, thumbnailSize );
                         if( icon != null )
                         {
                             holder.setIcon( icon );
                             return;
                         }
-                        icon = ThumbnailUtils.createVideoThumbnail( file.getAbsolutePath(), MediaStore.Images.Thumbnails.MICRO_KIND );
+                        icon = ThumbnailUtils.createVideoThumbnail( holder.File.getAbsolutePath(), MediaStore.Images.Thumbnails.MICRO_KIND );
                         if( icon != null )
                         {
                             holder.setIcon( icon );
@@ -294,7 +361,7 @@ public class FileSelectorFragment extends Fragment
                 holder.PopulatingThreadId = t.getId();
                 t.start();
             }
-            holder.Name.setText( file.getName() );
+            holder.Name.setText( holder.File.getName() );
         }
 
         @Override
