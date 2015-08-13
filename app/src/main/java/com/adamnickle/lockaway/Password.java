@@ -22,6 +22,7 @@ public class Password
         catch( NoSuchAlgorithmException e )
         {
             e.printStackTrace();
+            LockAway.log( e.getMessage() );
             mDigest = new byte[]{ 0 };
         }
         mDigestLength = mDigest.length;

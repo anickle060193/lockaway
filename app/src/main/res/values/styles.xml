@@ -6,7 +6,7 @@
         <item name="android:textColor">@color/text_color</item>
     </style>
 
-    <style name="passcode_button">
+    <style name="passcode_button" parent="AppTheme">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:textSize">30sp</item>
@@ -16,16 +16,16 @@
         <item name="android:textColor">@color/text_color</item>
     </style>
 
-    <style name="passcode_row">
+    <style name="passcode_row" parent="AppTheme">
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">1</item>
     </style>
 
-    <style name="passcode_table">
+    <style name="passcode_table" parent="AppTheme">
         <item name="android:background">@color/secondary_background_color</item>
     </style>
 
-    <style name="passcode_text">
+    <style name="passcode_text" parent="AppTheme">
         <item name="android:textColor">@color/text_color</item>
         <item name="android:background">#6894B2</item>
         <item name="android:layout_width">match_parent</item>

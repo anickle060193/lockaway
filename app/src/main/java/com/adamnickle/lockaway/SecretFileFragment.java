@@ -1,29 +1,34 @@
 package com.adamnickle.lockaway;
 
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
 
 public class SecretFileFragment extends Fragment
 {
+    private static final int CHOOSE_FILE_REQUEST = 1001;
+
     private Password mPassword;
 
     // UI Elements
@@ -46,17 +51,7 @@ public class SecretFileFragment extends Fragment
     {
         super.onCreate( savedInstanceState );
         setRetainInstance( true );
-
-        try
-        {
-            FileOutputStream output = getActivity().openFileOutput( "test_" + System.currentTimeMillis(), Context.MODE_PRIVATE );
-            InputStream input = new ByteArrayInputStream( "This is a test.".getBytes( "UTF-8" ) );
-            SecretStream.encrypt( mPassword, input, output );
-        }
-        catch( IOException e )
-        {
-            e.printStackTrace();
-        }
+        setHasOptionsMenu( true );
     }
 
     @Override
@@ -87,15 +82,66 @@ public class SecretFileFragment extends Fragment
         return mMainView;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder
+    @Override
+    public void onCreateOptionsMenu( Menu menu, MenuInflater inflater )
     {
+        inflater.inflate( R.menu.menu_secret_file, menu );
+    }
+
+    @Override
+    public boolean onOptionsItemSelected( MenuItem item )
+    {
+        switch( item.getItemId() )
+        {
+            case R.id.actionAdd:
+                openFileManager();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected( item );
+        }
+    }
+
+    private void openFileManager()
+    {
+        Intent intent = new Intent( getActivity(), FileSelectorActivity.class );
+        startActivity( intent );
+    }
+
+    @Override
+    public void onActivityResult( int requestCode, int resultCode, Intent data )
+    {
+        if( requestCode == CHOOSE_FILE_REQUEST )
+        {
+            if( resultCode == Activity.RESULT_OK )
+            {
+            }
+        }
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder
+    {
+        View MainView;
         TextView Text;
 
         public ViewHolder( View itemView )
         {
             super( itemView );
 
-            Text = (TextView)itemView;
+            MainView = itemView;
+            Text = (TextView)MainView.findViewById( R.id.text );
+        }
+
+        public void setHolderText( final String text )
+        {
+            new Handler( Looper.getMainLooper() ).post( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    ViewHolder.this.Text.setText( text );
+                }
+            } );
         }
     }
 
@@ -116,22 +162,67 @@ public class SecretFileFragment extends Fragment
         }
 
         @Override
-        public void onBindViewHolder( ViewHolder viewHolder, int i )
+        public void onBindViewHolder( final ViewHolder viewHolder, final int i )
         {
-            File file = get( i );
-            try
+            new Thread()
             {
-                FileInputStream input = getActivity().openFileInput( file.getName() );
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                SecretStream.decrypt( mPassword, input, output );
-                String text = new String( output.toByteArray(), "UTF-8" );
-                viewHolder.Text.setText( text );
-            }
-            catch( IOException e )
-            {
-                e.printStackTrace();
-                viewHolder.Text.setText( file.getName() );
-            }
+                @Override
+                public void run()
+                {
+                    File file = get( i );
+                    FileInputStream input = null;
+                    ByteArrayOutputStream output = null;
+                    try
+                    {
+                        input = getActivity().openFileInput( file.getName() );
+                        /*
+                        File temp = File.createTempFile( "vid", null );
+                        FileOutputStream tempOutput = new FileOutputStream( temp );
+
+                        SecretStream.decrypt( mPassword, input, tempOutput );
+
+                        tempOutput.close();
+
+                        MediaMetadataRetriever ret = new MediaMetadataRetriever();
+                        */
+
+                        output = new ByteArrayOutputStream();
+                        SecretStream.decrypt( mPassword, input, output );
+                        String text = new String( output.toByteArray(), "UTF-8" );
+                        viewHolder.setHolderText( text );
+                    }
+                    catch( IOException e )
+                    {
+                        LockAway.log( e );
+                        viewHolder.setHolderText( file.getName() );
+                    }
+                    finally
+                    {
+                        if( input != null )
+                        {
+                            try
+                            {
+                                input.close();
+                            }
+                            catch( IOException ex )
+                            {
+                                LockAway.log( ex );
+                            }
+                        }
+                        if( output != null )
+                        {
+                            try
+                            {
+                                output.close();
+                            }
+                            catch( IOException ex )
+                            {
+                                LockAway.log( ex );
+                            }
+                        }
+                    }
+                }
+            }.start();
         }
     }
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="@dimen/file_item_thumbnail"
+        android:layout_height="@dimen/file_item_thumbnail"
+        android:src="@drawable/ic_insert_drive_file_white_48dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:padding="2dp"/>
+
+    <TextView
+        android:id="@+id/item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginStart="8dp"
+        android:text="im_a_file.jpg"
+        android:layout_toEndOf="@id/icon"
+        android:layout_toStartOf="@+id/size"
+        android:layout_centerVertical="true"
+        android:textAlignment="viewStart"
+        android:singleLine="true"/>
+
+    <TextView
+        android:id="@+id/size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginEnd="8dp"
+        android:text="82kb"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"/>
+
+</RelativeLayout>

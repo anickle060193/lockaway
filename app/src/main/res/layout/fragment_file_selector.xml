@@ -1,0 +1,57 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.adamnickle.lockaway.FileSelectorFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin">
+
+        <Button
+            android:id="@+id/toParentDirectory"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:text="\u2191"
+            android:textSize="50sp"
+            android:background="@null"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Selected folder:"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/toParentDirectory"
+            android:layout_alignTop="@+id/toParentDirectory"/>
+
+        <TextView
+            android:id="@+id/parentDirectory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/storage/data"
+            android:textSize="18sp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/toParentDirectory"
+            android:layout_alignBottom="@+id/toParentDirectory"
+            android:singleLine="true"
+            android:scrollHorizontally="true" />
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/childrenRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+</LinearLayout>
