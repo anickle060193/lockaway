@@ -21,7 +21,8 @@
         </activity>
         <activity
             android:name=".FileSelectorActivity"
-            android:label="@string/title_activity_file_selector" >
+            android:label="@string/title_activity_file_selector"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

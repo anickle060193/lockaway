@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Formatter;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,6 +93,34 @@ public class FileSelectorFragment extends Fragment
         return mMainView;
     }
 
+    @Override
+    public void onActivityCreated( Bundle savedInstanceState )
+    {
+        super.onActivityCreated( savedInstanceState );
+
+        final View view = getView();
+        if( view != null )
+        {
+            view.setFocusableInTouchMode( true );
+            view.requestFocus();
+            view.setOnKeyListener( new View.OnKeyListener()
+            {
+                @Override
+                public boolean onKey( View v, int keyCode, KeyEvent event )
+                {
+                    if( event.getAction() == KeyEvent.ACTION_DOWN )
+                    {
+                        if( keyCode == KeyEvent.KEYCODE_BACK )
+                        {
+                            return mFileSystemAdapter.gotoParentDirectory();
+                        }
+                    }
+                    return false;
+                }
+            } );
+        }
+    }
+
     private class ViewHolder extends RecyclerView.ViewHolder
     {
         View MainView;
@@ -159,7 +188,7 @@ public class FileSelectorFragment extends Fragment
             mParentDirectory.setText( mCurrentDirectory.getAbsolutePath() );
         }
 
-        public void gotoParentDirectory()
+        public boolean gotoParentDirectory()
         {
             if( mCurrentDirectory != null )
             {
@@ -167,8 +196,10 @@ public class FileSelectorFragment extends Fragment
                 if( parent != null )
                 {
                     setDirectory( parent );
+                    return true;
                 }
             }
+            return false;
         }
 
         private final Comparator<File> mFileSorter = new Comparator<File>()
@@ -239,15 +270,17 @@ public class FileSelectorFragment extends Fragment
                     public void run()
                     {
                         final int thumbnailSize = getActivity().getResources().getDimensionPixelSize( R.dimen.file_item_thumbnail );
-                        final Bitmap icon = BitmapHelper.createScaledBitmap( file.getAbsolutePath(), thumbnailSize, thumbnailSize );
+                        Bitmap icon = BitmapHelper.createScaledBitmap( file.getAbsolutePath(), thumbnailSize, thumbnailSize );
                         if( icon != null )
                         {
                             holder.setIcon( icon );
+                            return;
                         }
-                        else
+                        icon = ThumbnailUtils.createVideoThumbnail( file.getAbsolutePath(), MediaStore.Images.Thumbnails.MICRO_KIND );
+                        if( icon != null )
                         {
-                            final Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail( file.getAbsolutePath(), MediaStore.Images.Thumbnails.MICRO_KIND );
-                            holder.setIcon( thumbnail );
+                            holder.setIcon( icon );
+                            return;
                         }
                     }
                 };
