@@ -13,7 +13,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,7 +29,7 @@ public class FileSelectorFragment extends Fragment
     private View mMainView;
     private RecyclerView mRecyclerView;
     private TextView mParentDirectory;
-    private Button mToParentDirectory;
+    private ImageButton mToParentDirectory;
 
     private FileSystemRecyclerAdapter mFileSystemAdapter;
 
@@ -42,7 +42,7 @@ public class FileSelectorFragment extends Fragment
         {
             mMainView = inflater.inflate( R.layout.fragment_file_selector, container, false );
             mParentDirectory = (TextView)mMainView.findViewById( R.id.parentDirectory );
-            mToParentDirectory = (Button)mMainView.findViewById( R.id.toParentDirectory );
+            mToParentDirectory = (ImageButton)mMainView.findViewById( R.id.toParentDirectory );
             mToParentDirectory.setOnClickListener( new View.OnClickListener()
             {
                 @Override
@@ -245,7 +245,14 @@ public class FileSelectorFragment extends Fragment
             final File file = get( position );
             if( file.isDirectory() )
             {
-                holder.Icon.setImageResource( R.drawable.ic_folder_white_48dp );
+                if( file.canRead() )
+                {
+                    holder.Icon.setImageResource( R.drawable.ic_folder_open_white_48dp );
+                }
+                else
+                {
+                    holder.Icon.setImageResource( R.drawable.ic_locked_folder );
+                }
                 holder.Size.setVisibility( View.GONE );
 
                 holder.MainView.setOnClickListener( new View.OnClickListener()
@@ -259,7 +266,7 @@ public class FileSelectorFragment extends Fragment
             }
             else
             {
-                holder.Icon.setImageResource( R.drawable.ic_insert_drive_file_white_48dp );
+                holder.Icon.setImageResource( R.drawable.ic_file );
                 holder.Size.setVisibility( View.VISIBLE );
                 holder.Size.setText( Formatter.formatFileSize( getActivity(), file.length() ) );
                 holder.MainView.setClickable( false );

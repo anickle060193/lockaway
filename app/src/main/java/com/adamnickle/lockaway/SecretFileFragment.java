@@ -175,16 +175,6 @@ public class SecretFileFragment extends Fragment
                     try
                     {
                         input = getActivity().openFileInput( file.getName() );
-                        /*
-                        File temp = File.createTempFile( "vid", null );
-                        FileOutputStream tempOutput = new FileOutputStream( temp );
-
-                        SecretStream.decrypt( mPassword, input, tempOutput );
-
-                        tempOutput.close();
-
-                        MediaMetadataRetriever ret = new MediaMetadataRetriever();
-                        */
 
                         output = new ByteArrayOutputStream();
                         SecretStream.decrypt( mPassword, input, output );

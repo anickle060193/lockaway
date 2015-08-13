@@ -6,47 +6,55 @@
     android:orientation="vertical"
     tools:context="com.adamnickle.lockaway.FileSelectorFragment">
 
-    <RelativeLayout
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin">
+        card_view:cardCornerRadius="4dp"
+        card_view:cardBackgroundColor="@color/dull_blue"
+        android:layout_margin="8dp">
 
-        <Button
-            android:id="@+id/toParentDirectory"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:text="\u2191"
-            android:textSize="50sp"
-            android:background="@null"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"/>
-
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Selected folder:"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginStart="8dp"
-            android:layout_toEndOf="@+id/toParentDirectory"
-            android:layout_alignTop="@+id/toParentDirectory"/>
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/parentDirectory"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="/storage/data"
-            android:textSize="18sp"
-            android:layout_marginStart="8dp"
-            android:layout_toEndOf="@+id/toParentDirectory"
-            android:layout_alignBottom="@+id/toParentDirectory"
-            android:singleLine="true"
-            android:scrollHorizontally="true" />
+            <ImageButton
+                android:id="@+id/toParentDirectory"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_keyboard_return_white_48dp"
+                style="?borderlessButtonStyle"
+                android:background="@null"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:enabled="false"/>
 
-    </RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selected folder:"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/toParentDirectory"
+                android:layout_alignTop="@+id/toParentDirectory"/>
+
+            <TextView
+                android:id="@+id/parentDirectory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/storage/data"
+                android:textSize="18sp"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/toParentDirectory"
+                android:layout_alignBottom="@+id/toParentDirectory"
+                android:singleLine="true"
+                android:scrollHorizontally="true" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/childrenRecyclerView"

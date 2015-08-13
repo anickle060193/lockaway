@@ -27,7 +27,7 @@
 
     <style name="passcode_text" parent="AppTheme">
         <item name="android:textColor">@color/text_color</item>
-        <item name="android:background">#6894B2</item>
+        <item name="android:background">@color/dull_blue</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">1</item>
