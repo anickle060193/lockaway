@@ -2,10 +2,8 @@ package com.adamnickle.lockaway;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,8 +19,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.HashSet;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -62,30 +61,11 @@ public class FileSelectorFragment extends Fragment
             mFileSystemAdapter = new FileSystemRecyclerAdapter();
             mRecyclerView.setAdapter( mFileSystemAdapter );
 
-            Intent intent = getActivity().getIntent();
-            File root = null;
-            if( intent != null )
-            {
-                String filename = intent.getStringExtra( FileSelectorActivity.EXTRA_INITIAL_DIRECTORY );
-                if( filename != null )
-                {
-                    File file = new File( filename );
-                    if( file.exists() )
-                    {
-                        root = new File( filename );
-                    }
-                }
-            }
-            if( root == null )
-            {
-                root = getActivity().getFilesDir();
-                File parent;
-                while( ( parent = root.getParentFile() ) != null )
-                {
-                    root = parent;
-                }
-            }
-            mFileSystemAdapter.setDirectory( root );
+            mFileSystemAdapter.setDirectory( getInitialDirectory() );
+
+            final Intent data = getActivity().getIntent();
+            final String[] extensions = data.getStringArrayExtra( FileSelectorActivity.EXTRA_FILE_EXTENSIONS );
+            mFileSystemAdapter.setFileTypes( extensions );
         }
         else
         {
@@ -96,6 +76,30 @@ public class FileSelectorFragment extends Fragment
             }
         }
         return mMainView;
+    }
+
+    private File getInitialDirectory()
+    {
+        final Intent intent = getActivity().getIntent();
+        if( intent != null )
+        {
+            final String filename = intent.getStringExtra( FileSelectorActivity.EXTRA_INITIAL_DIRECTORY );
+            if( filename != null )
+            {
+                final File file = new File( filename );
+                if( file.exists() )
+                {
+                    return new File( filename );
+                }
+            }
+        }
+        File root = getActivity().getFilesDir();
+        File parent;
+        while( ( parent = root.getParentFile() ) != null )
+        {
+            root = parent;
+        }
+        return root;
     }
 
     @Override
@@ -167,16 +171,16 @@ public class FileSelectorFragment extends Fragment
             Size = (TextView)MainView.findViewById( R.id.size );
         }
 
-        public void setIcon( final Bitmap bitmap )
+        public void setIcon( final Drawable icon )
         {
             if( Thread.currentThread().getId() == PopulatingThreadId )
             {
-                getActivity().runOnUiThread( new Runnable()
+                Icon.post( new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        Icon.setImageBitmap( bitmap );
+                        Icon.setImageDrawable( icon );
                     }
                 } );
             }
@@ -218,6 +222,24 @@ public class FileSelectorFragment extends Fragment
     private class FileSystemRecyclerAdapter extends ArrayRecyclerAdapter<File, ViewHolder>
     {
         private File mCurrentDirectory;
+        private FileFilter mFileFilter;
+
+        public void setFileTypes( final String[] extensions )
+        {
+            if( extensions != null )
+            {
+                final HashSet<String> extensionSet = new HashSet<>( Arrays.asList( extensions ) );
+                mFileFilter = new FileFilter()
+                {
+                    @Override
+                    public boolean accept( File file )
+                    {
+                        final String extension = Helper.getExtension( file );
+                        return extensionSet.contains( extension );
+                    }
+                };
+            }
+        }
 
         public File getDirectory()
         {
@@ -229,7 +251,7 @@ public class FileSelectorFragment extends Fragment
             if( file.exists() )
             {
                 final File directory = file.isDirectory() ? file : file.getParentFile();
-                final File[] children = directory.listFiles();
+                final File[] children = directory.listFiles( mFileFilter );
                 if( !file.canRead() )
                 {
                     LockAway.toast( "Access denied to '" + directory.getName() + "'." );
@@ -237,7 +259,7 @@ public class FileSelectorFragment extends Fragment
                 else if( children != null )
                 {
                     this.clear();
-                    Arrays.sort( children, mFileSorter );
+                    Helper.sort( children );
                     this.addAll( Arrays.asList( children ) );
 
                     mCurrentDirectory = directory;
@@ -259,34 +281,6 @@ public class FileSelectorFragment extends Fragment
             }
             return false;
         }
-
-        private final Comparator<File> mFileSorter = new Comparator<File>()
-        {
-            @Override
-            public int compare( File lhs, File rhs )
-            {
-                if( lhs == null )
-                {
-                    return rhs == null ? 0 : 1;
-                }
-                else if( rhs == null )
-                {
-                    return -1;
-                }
-                else if( lhs.isDirectory() )
-                {
-                    if( !rhs.isDirectory() )
-                    {
-                        return -1;
-                    }
-                }
-                else if( rhs.isDirectory() )
-                {
-                    return 1;
-                }
-                return lhs.getName().compareTo( rhs.getName() );
-            }
-        };
 
         @Override
         public ViewHolder onCreateViewHolder( ViewGroup parent, int viewType )
@@ -343,19 +337,8 @@ public class FileSelectorFragment extends Fragment
                     @Override
                     public void run()
                     {
-                        final int thumbnailSize = getActivity().getResources().getDimensionPixelSize( R.dimen.file_item_thumbnail );
-                        Bitmap icon = BitmapHelper.createScaledBitmap( holder.File.getAbsolutePath(), thumbnailSize, thumbnailSize );
-                        if( icon != null )
-                        {
-                            holder.setIcon( icon );
-                            return;
-                        }
-                        icon = ThumbnailUtils.createVideoThumbnail( holder.File.getAbsolutePath(), MediaStore.Images.Thumbnails.MICRO_KIND );
-                        if( icon != null )
-                        {
-                            holder.setIcon( icon );
-                            return;
-                        }
+                        final Drawable icon = Helper.getThumbnail( getActivity().getResources(), holder.File.getAbsolutePath() );
+                        holder.setIcon( icon );
                     }
                 };
                 holder.PopulatingThreadId = t.getId();

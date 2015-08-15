@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 public class FileSelectorActivity extends AppCompatActivity
 {
     public static final String EXTRA_INITIAL_DIRECTORY = "extra_initial_directory";
+    public static final String EXTRA_FILE_EXTENSIONS = "extra_file_extensions";
+
     public static final String EXTRA_FILENAME = "extra_filename";
 
     private FileSelectorFragment mFragment;
