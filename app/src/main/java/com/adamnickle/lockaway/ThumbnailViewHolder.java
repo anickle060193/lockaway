@@ -25,7 +25,7 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
 
     public void setThumbnail( final Drawable thumbnail )
     {
-        if( PopulatingThreadId == Thread.currentThread().getId() )
+        if( thumbnail != null && PopulatingThreadId == Thread.currentThread().getId() )
         {
             Thumbnail.post( new Runnable()
             {

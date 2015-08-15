@@ -37,7 +37,7 @@ public class UnlockingInputStream extends InputStream
         int b = mInput.read();
         if( b != -1 )
         {
-            b = mKey.decryptData( b, mByteOffset );
+            b = mKey.unlock( b, mByteOffset );
             mByteOffset++;
         }
         return b;

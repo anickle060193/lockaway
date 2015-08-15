@@ -37,14 +37,14 @@ public class Key implements Parcelable
         mDigestLength = in.readInt();
     }
 
-    public int encryptData( int input, int byteOffset )
+    public int lock( int input, int byteOffset )
     {
         return input ^ mDigest[ byteOffset % mDigestLength ];
     }
 
-    public int decryptData( int input, int byteOffset )
+    public int unlock( int input, int byteOffset )
     {
-        return encryptData( input, byteOffset );
+        return lock( input, byteOffset );
     }
 
     public static final Creator<Key> CREATOR = new Creator<Key>()

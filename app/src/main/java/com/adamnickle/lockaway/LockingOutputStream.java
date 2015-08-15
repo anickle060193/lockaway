@@ -28,7 +28,7 @@ public class LockingOutputStream extends OutputStream
     @Override
     public void write( int oneByte ) throws IOException
     {
-        mOutput.write( mKey.encryptData( oneByte, mByteOffset ) );
+        mOutput.write( mKey.lock( oneByte, mByteOffset ) );
         mByteOffset++;
     }
 

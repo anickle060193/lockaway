@@ -70,7 +70,7 @@ public class PasscodeActivity extends ActionBarActivity
             {
                 final Key key = new Key( mPasscode );
                 Intent intent = new Intent( this, LockedFilesActivity.class );
-                intent.putExtra( LockedFilesActivity.EXTRA_LOCKER, key );
+                intent.putExtra( LockedFilesActivity.EXTRA_KEY, key );
                 startActivity( intent );
             }
         }

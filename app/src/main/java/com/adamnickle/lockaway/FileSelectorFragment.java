@@ -61,11 +61,11 @@ public class FileSelectorFragment extends Fragment
             mFileSystemAdapter = new FileSystemRecyclerAdapter();
             mRecyclerView.setAdapter( mFileSystemAdapter );
 
-            mFileSystemAdapter.setDirectory( getInitialDirectory() );
-
             final Intent data = getActivity().getIntent();
             final String[] extensions = data.getStringArrayExtra( FileSelectorActivity.EXTRA_FILE_EXTENSIONS );
             mFileSystemAdapter.setFileTypes( extensions );
+
+            mFileSystemAdapter.setDirectory( getInitialDirectory() );
         }
         else
         {
@@ -234,8 +234,19 @@ public class FileSelectorFragment extends Fragment
                     @Override
                     public boolean accept( File file )
                     {
-                        final String extension = Helper.getExtension( file );
-                        return extensionSet.contains( extension );
+                        if( file.isDirectory() )
+                        {
+                            return true;
+                        }
+                        else if( file.isFile() )
+                        {
+                            final String extension = Helper.getExtension( file );
+                            return extensionSet.contains( extension );
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 };
             }

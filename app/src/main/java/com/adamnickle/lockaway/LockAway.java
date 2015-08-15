@@ -2,6 +2,8 @@ package com.adamnickle.lockaway;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -42,8 +44,23 @@ public class LockAway extends Application
         ex.printStackTrace();
     }
 
-    public static void toast( String message )
+    public static void toast( final String message )
     {
-        Toast.makeText( sContext, message, Toast.LENGTH_LONG ).show();
+        final Looper mainLooper = Looper.getMainLooper();
+        if( Looper.getMainLooper().getThread() == Thread.currentThread() )
+        {
+            Toast.makeText( sContext, message, Toast.LENGTH_LONG ).show();
+        }
+        else
+        {
+            new Handler( mainLooper ).post( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    Toast.makeText( sContext, message, Toast.LENGTH_LONG ).show();
+                }
+            } );
+        }
     }
 }
