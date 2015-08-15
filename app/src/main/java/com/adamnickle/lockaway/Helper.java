@@ -132,15 +132,15 @@ public final class Helper
         return BitmapFactory.decodeFile( filename, opts );
     }
 
-    public static Bitmap createScaledBitmapFromSecret( Password pw, String filename, int reqWidth, int reqHeight )
+    public static Bitmap createScaledBitmapFromLocked( Key key, String filename, int reqWidth, int reqHeight )
     {
-        SecretInputStream input1 = null;
-        SecretInputStream input2 = null;
+        UnlockingInputStream input1 = null;
+        UnlockingInputStream input2 = null;
         try
         {
             final BitmapFactory.Options opts = new BitmapFactory.Options();
             opts.inJustDecodeBounds = true;
-            input1 = new SecretInputStream( pw, filename );
+            input1 = new UnlockingInputStream( key, filename );
             BitmapFactory.decodeStream( input1, null, opts );
             if( opts.outHeight == -1 && opts.outWidth == -1 )
             {
@@ -161,7 +161,7 @@ public final class Helper
             }
             opts.inJustDecodeBounds = false;
             opts.inSampleSize = sampleSize;
-            input2 = new SecretInputStream( pw, filename );
+            input2 = new UnlockingInputStream( key, filename );
             return BitmapFactory.decodeStream( input2, null, opts );
         }
         catch( IOException ex )

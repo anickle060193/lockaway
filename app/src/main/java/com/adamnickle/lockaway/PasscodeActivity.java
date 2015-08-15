@@ -68,9 +68,9 @@ public class PasscodeActivity extends ActionBarActivity
         {
             if( mPasscode.length() == PASSCODE_LENGTH )
             {
-                final Password password = new Password( mPasscode );
-                Intent intent = new Intent( this, SecretFilesActivity.class );
-                intent.putExtra( SecretFilesActivity.EXTRA_PASSWORD, password );
+                final Key key = new Key( mPasscode );
+                Intent intent = new Intent( this, LockedFilesActivity.class );
+                intent.putExtra( LockedFilesActivity.EXTRA_LOCKER, key );
                 startActivity( intent );
             }
         }

@@ -9,17 +9,17 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Created by Adam on 8/8/2015.
  */
-public class Password implements Parcelable
+public class Key implements Parcelable
 {
     private byte[] mDigest;
     private int mDigestLength;
 
-    public Password( String pw )
+    public Key( String locker )
     {
         try
         {
             MessageDigest digester = MessageDigest.getInstance( "SHA256" );
-            digester.update( pw.getBytes() );
+            digester.update( locker.getBytes() );
             mDigest = digester.digest();
         }
         catch( NoSuchAlgorithmException e )
@@ -31,7 +31,7 @@ public class Password implements Parcelable
         mDigestLength = mDigest.length;
     }
 
-    protected Password( Parcel in )
+    protected Key( Parcel in )
     {
         mDigest = in.createByteArray();
         mDigestLength = in.readInt();
@@ -47,18 +47,18 @@ public class Password implements Parcelable
         return encryptData( input, byteOffset );
     }
 
-    public static final Creator<Password> CREATOR = new Creator<Password>()
+    public static final Creator<Key> CREATOR = new Creator<Key>()
     {
         @Override
-        public Password createFromParcel( Parcel in )
+        public Key createFromParcel( Parcel in )
         {
-            return new Password( in );
+            return new Key( in );
         }
 
         @Override
-        public Password[] newArray( int size )
+        public Key[] newArray( int size )
         {
-            return new Password[ size ];
+            return new Key[ size ];
         }
     };
 

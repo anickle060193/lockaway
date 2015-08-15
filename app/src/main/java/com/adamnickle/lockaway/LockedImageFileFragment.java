@@ -14,21 +14,21 @@ import android.view.ViewGroup;
 import java.io.File;
 
 
-public class SecretImageFileFragment extends Fragment
+public class LockedImageFileFragment extends Fragment
 {
-    private Password mPassword;
+    private Key mKey;
 
     private View mMainView;
     private RecyclerView mRecycleView;
 
-    public static SecretImageFileFragment newInstance( Password password )
+    public static LockedImageFileFragment newInstance( Key key )
     {
-        SecretImageFileFragment fragment = new SecretImageFileFragment();
-        fragment.mPassword = password;
+        LockedImageFileFragment fragment = new LockedImageFileFragment();
+        fragment.mKey = key;
         return fragment;
     }
 
-    public SecretImageFileFragment() { }
+    public LockedImageFileFragment() { }
 
     @Override
     public void onCreate( Bundle savedInstanceState )
@@ -42,7 +42,7 @@ public class SecretImageFileFragment extends Fragment
         return inflater.inflate( R.layout.recycle_view, container, false );
     }
 
-    private class SecretImageFileArrayAdapter extends ArrayRecyclerAdapter<File, ThumbnailViewHolder>
+    private class LockedImageFileArrayAdapter extends ArrayRecyclerAdapter<File, ThumbnailViewHolder>
     {
         @Override
         public ThumbnailViewHolder onCreateViewHolder( ViewGroup parent, int viewType )
@@ -62,7 +62,7 @@ public class SecretImageFileFragment extends Fragment
                 public void run()
                 {
                     final int thumbnailSize = getResources().getDimensionPixelSize( R.dimen.thumbnail_size );
-                    final Bitmap thumbnail = Helper.createScaledBitmapFromSecret( mPassword, file.getAbsolutePath(), thumbnailSize, thumbnailSize );
+                    final Bitmap thumbnail = Helper.createScaledBitmapFromLocked( mKey, file.getAbsolutePath(), thumbnailSize, thumbnailSize );
                     final Drawable thumbnailDrawable = new BitmapDrawable( getResources(), thumbnail );
                     holder.setThumbnail( thumbnailDrawable );
                 }

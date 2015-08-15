@@ -8,27 +8,27 @@ import java.io.OutputStream;
 /**
  * Created by Adam on 8/12/2015.
  */
-public class SecretOutputStream extends OutputStream
+public class LockingOutputStream extends OutputStream
 {
-    private final Password mPassword;
+    private final Key mKey;
     private final OutputStream mOutput;
     private int mByteOffset = 0;
 
-    public SecretOutputStream( Password pw, OutputStream outputStream )
+    public LockingOutputStream( Key key, OutputStream outputStream )
     {
-        mPassword = pw;
+        mKey = key;
         mOutput = outputStream;
     }
 
-    public SecretOutputStream( Password pw, String filename ) throws FileNotFoundException
+    public LockingOutputStream( Key key, String filename ) throws FileNotFoundException
     {
-        this( pw, new FileOutputStream( filename ) );
+        this( key, new FileOutputStream( filename ) );
     }
 
     @Override
     public void write( int oneByte ) throws IOException
     {
-        mOutput.write( mPassword.encryptData( oneByte, mByteOffset ) );
+        mOutput.write( mKey.encryptData( oneByte, mByteOffset ) );
         mByteOffset++;
     }
 

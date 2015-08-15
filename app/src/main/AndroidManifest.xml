@@ -16,7 +16,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".SecretFilesActivity"
+            android:name=".LockedFilesActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity

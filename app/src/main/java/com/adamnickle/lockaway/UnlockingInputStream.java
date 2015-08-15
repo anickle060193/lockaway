@@ -8,21 +8,21 @@ import java.io.InputStream;
 /**
  * Created by Adam on 8/12/2015.
  */
-public class SecretInputStream extends InputStream
+public class UnlockingInputStream extends InputStream
 {
-    private final Password mPassword;
+    private final Key mKey;
     private final InputStream mInput;
     private int mByteOffset = 0;
 
-    public SecretInputStream( Password pw, InputStream inputStream )
+    public UnlockingInputStream( Key key, InputStream inputStream )
     {
-        mPassword = pw;
+        mKey = key;
         mInput = inputStream;
     }
 
-    public SecretInputStream( Password pw, String filename ) throws FileNotFoundException
+    public UnlockingInputStream( Key key, String filename ) throws FileNotFoundException
     {
-        this( pw, new FileInputStream( filename ) );
+        this( key, new FileInputStream( filename ) );
     }
 
     @Override
@@ -37,7 +37,7 @@ public class SecretInputStream extends InputStream
         int b = mInput.read();
         if( b != -1 )
         {
-            b = mPassword.decryptData( b, mByteOffset );
+            b = mKey.decryptData( b, mByteOffset );
             mByteOffset++;
         }
         return b;
