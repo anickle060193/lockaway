@@ -94,7 +94,7 @@
                 <ImageButton
                     android:id="@+id/enter"
                     style="@style/passcode_button"
-                    android:src="@drawable/ic_done_white_48dp"/>
+                    android:src="@drawable/ic_vpn_key_white_48dp"/>
             </TableRow>
 
         </TableLayout>
