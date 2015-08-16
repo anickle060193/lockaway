@@ -13,9 +13,12 @@ import android.support.v4.app.FragmentManager;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import javax.crypto.CipherInputStream;
 
 /**
  * Created by Adam on 8/15/2015.
@@ -134,13 +137,13 @@ public final class Helper
 
     public static Bitmap createScaledBitmapFromLocked( Key key, String filename, int reqWidth, int reqHeight )
     {
-        UnlockingInputStream input1 = null;
-        UnlockingInputStream input2 = null;
+        CipherInputStream input1 = null;
+        CipherInputStream input2 = null;
         try
         {
             final BitmapFactory.Options opts = new BitmapFactory.Options();
             opts.inJustDecodeBounds = true;
-            input1 = new UnlockingInputStream( key, filename );
+            input1 = new CipherInputStream( new FileInputStream( filename ), key.getUnlocker() );
             BitmapFactory.decodeStream( input1, null, opts );
             if( opts.outHeight == -1 && opts.outWidth == -1 )
             {
@@ -161,7 +164,7 @@ public final class Helper
             }
             opts.inJustDecodeBounds = false;
             opts.inSampleSize = sampleSize;
-            input2 = new UnlockingInputStream( key, filename );
+            input2 = new CipherInputStream( new FileInputStream( filename ), key.getUnlocker() );
             return BitmapFactory.decodeStream( input2, null, opts );
         }
         catch( IOException ex )
@@ -188,6 +191,14 @@ public final class Helper
             {
                 LockAway.log( ex );
             }
+        }
+    }
+
+    public static void checkOffsetAndCount( int arrayLength, int offset, int count )
+    {
+        if( ( offset | count ) < 0 || offset > arrayLength || arrayLength - offset < count )
+        {
+            throw new ArrayIndexOutOfBoundsException();
         }
     }
 }

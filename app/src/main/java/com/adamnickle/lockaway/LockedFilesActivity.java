@@ -21,7 +21,7 @@ public class LockedFilesActivity extends AppCompatActivity
         void add( String filename );
     }
 
-    public static final String EXTRA_KEY = "extra_key";
+    public static final String EXTRA_PASSCODE = "extra_passcode";
 
     private static final String[] IMAGE_EXTENSIONS = { "jpg", "jpeg", "gif", "png", "bmp", "webp" };
     private static final String[] VIDEO_EXTENSIONS = { "3gp", "mp4", "ts", "webm", "mkv" };
@@ -50,7 +50,8 @@ public class LockedFilesActivity extends AppCompatActivity
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_locked_files );
 
-        mKey = getIntent().getParcelableExtra( LockedFilesActivity.EXTRA_KEY );
+        final String passcode = getIntent().getStringExtra( LockedFilesActivity.EXTRA_PASSCODE );
+        mKey = new Key( passcode );
 
         mLockedImageFilesFragment = LockedImageFilesFragment.newInstance( mKey );
         mLockedVideoFilesFragment = LockedImageFilesFragment.newInstance( mKey );

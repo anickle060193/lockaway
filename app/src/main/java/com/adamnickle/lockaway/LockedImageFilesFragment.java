@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
 
 
 public class LockedImageFilesFragment extends Fragment implements LockedFilesActivity.LockedFragment
@@ -80,7 +84,7 @@ public class LockedImageFilesFragment extends Fragment implements LockedFilesAct
     public void add( String filename )
     {
         FileInputStream input = null;
-        LockingOutputStream output = null;
+        CipherOutputStream output = null;
         try
         {
             input = new FileInputStream( filename );
@@ -91,7 +95,7 @@ public class LockedImageFilesFragment extends Fragment implements LockedFilesAct
             {
                 throw new IOException( "Could not create locked file directories." );
             }
-            output = new LockingOutputStream( mKey, outputFile.getAbsolutePath() );
+            output = new CipherOutputStream( new FileOutputStream( outputFile.getAbsolutePath() ), mKey.getLocker() );
 
             int b;
             while( ( b = input.read() ) != -1 )
@@ -119,17 +123,20 @@ public class LockedImageFilesFragment extends Fragment implements LockedFilesAct
 
     private void unlock( String filename )
     {
-        UnlockingInputStream input;
+        CipherInputStream input;
         FileOutputStream output;
         try
         {
-            input = new UnlockingInputStream( mKey, filename );
-            output = new FileOutputStream( "/mnt/sdcard/DCIM/test" + Helper.getExtension( filename ) );
+            input = new CipherInputStream( new FileInputStream( filename ), mKey.getUnlocker() );
+            final String outputFilename = new File( filename ).getName() + "." + Helper.getExtension( filename );
+            final File outputFile = new File( Environment.getExternalStoragePublicDirectory( Environment.DIRECTORY_DCIM ), outputFilename );
+            output = new FileOutputStream( outputFile );
             int b;
             while( ( b = input.read() ) != -1 )
             {
                 output.write( b );
             }
+            LockAway.toast( "File has been unlocked." );
         }
         catch( IOException ex )
         {

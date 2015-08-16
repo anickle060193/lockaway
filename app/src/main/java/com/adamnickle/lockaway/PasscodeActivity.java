@@ -1,15 +1,18 @@
 package com.adamnickle.lockaway;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-public class PasscodeActivity extends ActionBarActivity
+public class PasscodeActivity extends AppCompatActivity
 {
+    public static final String EXTRA_PASSCODE = "extra_passcode";
+
     private static final int[] KEYPAD_BUTTON_IDS = { R.id.b0, R.id.b1, R.id.b2, R.id.b3, R.id.b4, R.id.b5, R.id.b6, R.id.b7, R.id.b8, R.id.b9 };
     private static final int PASSCODE_LENGTH = 4;
 
@@ -26,6 +29,7 @@ public class PasscodeActivity extends ActionBarActivity
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_passcode );
+        setResult( Activity.RESULT_CANCELED );
 
         mPromptTextView = (TextView)findViewById( R.id.promptText );
         mPasscodeTextView = (TextView)findViewById( R.id.passcodeText );
@@ -68,9 +72,8 @@ public class PasscodeActivity extends ActionBarActivity
         {
             if( mPasscode.length() == PASSCODE_LENGTH )
             {
-                final Key key = new Key( mPasscode );
-                Intent intent = new Intent( this, LockedFilesActivity.class );
-                intent.putExtra( LockedFilesActivity.EXTRA_KEY, key );
+                final Intent intent = new Intent( this, LockedFilesActivity.class );
+                intent.putExtra( LockedFilesActivity.EXTRA_PASSCODE, mPasscode );
                 startActivity( intent );
             }
         }
